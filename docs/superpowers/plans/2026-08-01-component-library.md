@@ -16,6 +16,8 @@
 - Category values are restricted to the fixed enum: `Hover | Cards | Navigation | Scrolling | Typography | Cursor | Motion | 3D | Toggle | Showcase`.
 - Original `v*.txt` files (and `effect names.txt`) are deleted only in the final task (Task 25), after every component is verified ported — never delete a source file in the same task that reads from it.
 - No ESLint/hydration checks (not in scope, no SSR) — see spec's Verification section for the exact intended checks.
+- Shell commands below use Bash/Git Bash syntax (as used throughout this session). If executing from PowerShell instead, translate directly: `grep -c "pattern" file` → `(Select-String -Path file -Pattern "pattern").Count`; heredoc commit messages → a `here-string` (`@'...'@`); everything else (`git`, `npm`) runs identically.
+- The 404 case for an unknown `:slug` route is intentionally a plain inline "Not found" message — no redirect, no dedicated 404 page. This is a 16-entry internal tool; a styled error page is unnecessary scope.
 
 ---
 
@@ -189,7 +191,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 ```
 
-Run `npm install clsx tailwind-merge` if not already present from Task 1 (they are — this just confirms).
+(`clsx` and `tailwind-merge` are already installed from Task 1, Step 2 — no reinstall needed.)
 
 - [ ] **Step 4: Define shared types**
 
@@ -249,13 +251,13 @@ git commit -m "feat: add cn() utility and shared ComponentMeta/Category types"
 (Note: shared gallery UI pieces live under `src/components-lib/`, distinct from the ported design components under `src/components/<slug>/`, so the glob patterns in Task 5 never pick up gallery infrastructure by accident.)
 
 **Interfaces:**
-- Produces: `<ErrorBoundary slug={string}>{children}</ErrorBoundary>` — catches render/lifecycle errors from `children`, shows a fallback with the error message and a Retry button; clicking Retry remounts `children`.
+- Produces: `<ErrorBoundary slug={string} onRetry={() => void}>{children}</ErrorBoundary>` — catches render/lifecycle errors from `children`, shows a fallback with the error message and a Retry button. `ErrorBoundary` holds no remount logic of its own: clicking Retry just calls the `onRetry` prop, and the caller (Task 7's `ComponentDetail`) is the single place that owns remounting, via the same handler its own Restart button uses (bumping a `key` on this component). This avoids two independent reset mechanisms — see design-review note in Task 7.
 
 - [ ] **Step 1: Write the failing test**
 
 ```tsx
 import { render, screen, fireEvent } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { ErrorBoundary } from './ErrorBoundary'
 
 function Bomb({ shouldThrow }: { shouldThrow: boolean }) {
@@ -266,22 +268,24 @@ function Bomb({ shouldThrow }: { shouldThrow: boolean }) {
 describe('ErrorBoundary', () => {
   it('renders children when there is no error', () => {
     render(
-      <ErrorBoundary slug="test-slug">
+      <ErrorBoundary slug="test-slug" onRetry={() => {}}>
         <Bomb shouldThrow={false} />
       </ErrorBoundary>
     )
     expect(screen.getByText('ok')).toBeInTheDocument()
   })
 
-  it('shows a crash message with the slug and error text on throw', () => {
+  it('shows a crash message with the slug and error text on throw, and calls onRetry when clicked', () => {
+    const onRetry = vi.fn()
     render(
-      <ErrorBoundary slug="test-slug">
+      <ErrorBoundary slug="test-slug" onRetry={onRetry}>
         <Bomb shouldThrow={true} />
       </ErrorBoundary>
     )
     expect(screen.getByText(/Component crashed: test-slug/i)).toBeInTheDocument()
     expect(screen.getByText(/boom/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /retry/i }))
+    expect(onRetry).toHaveBeenCalledTimes(1)
   })
 })
 ```
@@ -298,23 +302,19 @@ import { Component, type ReactNode } from 'react'
 
 interface Props {
   slug: string
+  onRetry: () => void
   children: ReactNode
 }
 
 interface State {
   error: Error | null
-  retryKey: number
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-  state: State = { error: null, retryKey: 0 }
+  state: State = { error: null }
 
   static getDerivedStateFromError(error: Error) {
     return { error }
-  }
-
-  handleRetry = () => {
-    this.setState((prev) => ({ error: null, retryKey: prev.retryKey + 1 }))
   }
 
   render() {
@@ -324,7 +324,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <p className="font-semibold">Component crashed: {this.props.slug}</p>
           <p className="text-sm text-red-500 mt-1">{this.state.error.message}</p>
           <button
-            onClick={this.handleRetry}
+            onClick={this.props.onRetry}
             className="mt-3 px-3 py-1 rounded bg-neutral-800 text-white"
           >
             Retry
@@ -332,10 +332,12 @@ export class ErrorBoundary extends Component<Props, State> {
         </div>
       )
     }
-    return <div key={this.state.retryKey}>{this.props.children}</div>
+    return this.props.children
   }
 }
 ```
+
+Note: this boundary never clears `state.error` on its own — clicking Retry calls `onRetry`, which the parent handles by bumping a `key` prop, which unmounts and remounts a *fresh* `ErrorBoundary` instance (fresh state, no error). That's the one and only reset mechanism in the system.
 
 - [ ] **Step 4: Run tests to verify they pass**
 
@@ -491,7 +493,7 @@ Expected: FAIL (module not found)
 - [ ] **Step 3: Implement `catalog.ts`**
 
 ```ts
-import { lazy } from 'react'
+import { lazy, type ComponentType } from 'react'
 import type { Category, ComponentMeta } from '@/types'
 
 export interface CatalogEntry extends ComponentMeta {
@@ -499,9 +501,12 @@ export interface CatalogEntry extends ComponentMeta {
   getSource: () => Promise<string>
 }
 
-const metaModules = import.meta.glob<{ default: ComponentMeta }>('./components/*/meta.ts', { eager: true })
-const componentLoaders = import.meta.glob('./components/*/index.tsx')
-const sourceLoaders = import.meta.glob('./components/*/index.tsx', { as: 'raw' })
+// Left untyped deliberately — import.meta.glob's inferred shape varies across
+// Vite versions. Values are validated by usage below (mod.default) rather than
+// leaned on at the type level.
+const metaModules = import.meta.glob('./components/*/meta.ts', { eager: true }) as Record<string, { default: ComponentMeta }>
+const componentLoaders = import.meta.glob('./components/*/index.tsx') as Record<string, () => Promise<{ default: ComponentType }>>
+const sourceLoaders = import.meta.glob('./components/*/index.tsx', { as: 'raw' }) as Record<string, () => Promise<string>>
 
 function folderFromPath(path: string) {
   // "./components/profile-card/meta.ts" -> "profile-card"
@@ -516,8 +521,8 @@ export function getCatalog(): CatalogEntry[] {
     const sourceLoader = sourceLoaders[componentPath]
     return {
       ...mod.default,
-      Component: loader ? lazy(loader as () => Promise<{ default: React.ComponentType }>) : null,
-      getSource: async () => (sourceLoader ? ((await sourceLoader()) as string) : ''),
+      Component: loader ? lazy(loader) : null,
+      getSource: async () => (sourceLoader ? await sourceLoader() : ''),
     }
   })
   return entries.sort((a, b) => a.name.localeCompare(b.name))
@@ -619,6 +624,10 @@ export function Home({ entries }: { entries: CatalogEntry[] }) {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<Category | 'All'>('All')
 
+  // Sorted here even though getCatalog() already returns alphabetical order —
+  // Home takes entries as a plain prop specifically so it doesn't depend on
+  // that upstream guarantee (matches the isolation goal from the design doc:
+  // a unit's correctness shouldn't rely on an assumption about its caller).
   const sorted = [...entries].sort((a, b) => a.name.localeCompare(b.name))
   const filtered = filterCatalog(sorted, {
     search: search || undefined,
@@ -692,8 +701,8 @@ git commit -m "feat: add Home grid page with search and category filter"
 - Create: `library/src/pages/ComponentDetail.tsx`, `library/src/pages/ComponentDetail.test.tsx`
 
 **Interfaces:**
-- Consumes: `CatalogEntry` (Task 5), `ErrorBoundary` (Task 3), `PreviewStage` (Task 4).
-- Produces: `<ComponentDetail entry: CatalogEntry>` — renders the live component (or a reference-only note if `!entry.runnable` or `Component` is `null`), a light/dark stage toggle, a Restart button, and a source panel.
+- Consumes: `CatalogEntry` (Task 5), `ErrorBoundary` (Task 3, now `onRetry`-driven per its updated design), `PreviewStage` (Task 4).
+- Produces: `<ComponentDetail entry: CatalogEntry>` — renders the live component (or a reference-only note if `!entry.runnable` or `Component` is `null`), a light/dark stage toggle, a Restart button, and a source panel. `ComponentDetail` is the single owner of remounting: both its own Restart button and `ErrorBoundary`'s Retry button call the same handler.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -706,28 +715,41 @@ import type { CatalogEntry } from '@/catalog'
 
 const FakeComponent = () => <div>fake rendered content</div>
 
-const runnableEntry: CatalogEntry = {
-  slug: 'fake-one', name: 'Fake One', description: 'desc', category: 'Cards',
-  tags: [], family: 'misc', deps: [], runnable: true,
-  Component: lazy(() => Promise.resolve({ default: FakeComponent })),
-  getSource: async () => 'export default function FakeOne() { return null }',
-}
-
-const referenceEntry: CatalogEntry = {
-  ...runnableEntry, slug: 'fake-two', name: 'Fake Two', runnable: false, Component: null,
-  notes: 'source not captured',
+function makeEntry(overrides: Partial<CatalogEntry> = {}): CatalogEntry {
+  return {
+    slug: 'fake-one', name: 'Fake One', description: 'desc', category: 'Cards',
+    tags: [], family: 'misc', deps: [], runnable: true,
+    Component: lazy(() => Promise.resolve({ default: FakeComponent })),
+    getSource: async () => 'export default function FakeOne() { return null }',
+    ...overrides,
+  }
 }
 
 describe('ComponentDetail', () => {
   it('renders the live component and its source', async () => {
-    render(<ComponentDetail entry={runnableEntry} />)
+    const entry = makeEntry()
+    render(<ComponentDetail entry={entry} />)
     await waitFor(() => expect(screen.getByText('fake rendered content')).toBeInTheDocument())
     fireEvent.click(screen.getByRole('button', { name: /view source/i }))
     expect(screen.getByText(/export default function FakeOne/)).toBeInTheDocument()
   })
 
+  it('only fetches source once across repeated toggles', async () => {
+    const getSource = vi.fn().mockResolvedValue('const x = 1')
+    const entry = makeEntry({ getSource })
+    render(<ComponentDetail entry={entry} />)
+    await waitFor(() => expect(screen.getByText('fake rendered content')).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: /view source/i })) // open
+    await waitFor(() => expect(screen.getByText(/const x = 1/)).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: /hide source/i })) // close
+    fireEvent.click(screen.getByRole('button', { name: /view source/i })) // open again
+    await waitFor(() => expect(screen.getByText(/const x = 1/)).toBeInTheDocument())
+    expect(getSource).toHaveBeenCalledTimes(1)
+  })
+
   it('shows a reference-only note instead of attempting to render when not runnable', () => {
-    render(<ComponentDetail entry={referenceEntry} />)
+    const entry = makeEntry({ slug: 'fake-two', name: 'Fake Two', runnable: false, Component: null, notes: 'source not captured' })
+    render(<ComponentDetail entry={entry} />)
     expect(screen.getByText(/source not captured/i)).toBeInTheDocument()
     expect(screen.queryByText('fake rendered content')).not.toBeInTheDocument()
   })
@@ -735,11 +757,25 @@ describe('ComponentDetail', () => {
   it('remounts the component when Restart is clicked', async () => {
     const spy = vi.fn()
     const Spied = () => { spy(); return <div>fake rendered content</div> }
-    const entry = { ...runnableEntry, Component: lazy(() => Promise.resolve({ default: Spied })) }
+    const entry = makeEntry({ Component: lazy(() => Promise.resolve({ default: Spied })) })
     render(<ComponentDetail entry={entry} />)
     await waitFor(() => expect(spy).toHaveBeenCalledTimes(1))
     fireEvent.click(screen.getByRole('button', { name: /restart/i }))
     await waitFor(() => expect(spy).toHaveBeenCalledTimes(2))
+  })
+
+  it('remounts (recovering from a crash) when ErrorBoundary Retry is clicked', async () => {
+    let shouldThrow = true
+    const Flaky = () => {
+      if (shouldThrow) throw new Error('boom')
+      return <div>recovered</div>
+    }
+    const entry = makeEntry({ Component: lazy(() => Promise.resolve({ default: Flaky })) })
+    render(<ComponentDetail entry={entry} />)
+    await waitFor(() => expect(screen.getByText(/Component crashed/i)).toBeInTheDocument())
+    shouldThrow = false
+    fireEvent.click(screen.getByRole('button', { name: /retry/i }))
+    await waitFor(() => expect(screen.getByText('recovered')).toBeInTheDocument())
   })
 })
 ```
@@ -760,7 +796,7 @@ import type { CatalogEntry } from '@/catalog'
 export function ComponentDetail({ entry }: { entry: CatalogEntry }) {
   const [restartKey, setRestartKey] = useState(0)
   const [showSource, setShowSource] = useState(false)
-  const [source, setSource] = useState('')
+  const [source, setSource] = useState<string | null>(null) // null = not yet fetched; cached after first load
   const [stageBg, setStageBg] = useState<'light' | 'dark'>(entry.background === 'dark' ? 'dark' : 'light')
 
   if (!entry.runnable || !entry.Component) {
@@ -775,8 +811,12 @@ export function ComponentDetail({ entry }: { entry: CatalogEntry }) {
   const Component = entry.Component
 
   async function toggleSource() {
-    if (!showSource) setSource(await entry.getSource())
+    if (!showSource && source === null) setSource(await entry.getSource())
     setShowSource((v) => !v)
+  }
+
+  function restart() {
+    setRestartKey((k) => k + 1)
   }
 
   return (
@@ -787,7 +827,7 @@ export function ComponentDetail({ entry }: { entry: CatalogEntry }) {
           <button onClick={() => setStageBg((b) => (b === 'light' ? 'dark' : 'light'))} className="px-3 py-1 border rounded">
             Toggle {stageBg === 'light' ? 'dark' : 'light'}
           </button>
-          <button onClick={() => setRestartKey((k) => k + 1)} className="px-3 py-1 border rounded">
+          <button onClick={restart} className="px-3 py-1 border rounded">
             Restart
           </button>
           <button onClick={toggleSource} className="px-3 py-1 border rounded">
@@ -795,7 +835,7 @@ export function ComponentDetail({ entry }: { entry: CatalogEntry }) {
           </button>
         </div>
       </div>
-      <ErrorBoundary slug={entry.slug} key={restartKey}>
+      <ErrorBoundary slug={entry.slug} onRetry={restart} key={restartKey}>
         <Suspense fallback={<div>Loading…</div>}>
           <PreviewStage previewHeight={entry.previewHeight} background={stageBg} scrollable={entry.scrollable}>
             <Component />
@@ -812,10 +852,12 @@ export function ComponentDetail({ entry }: { entry: CatalogEntry }) {
 }
 ```
 
+`restart` is the single remount handler in the whole system: Restart calls it directly, and `ErrorBoundary`'s Retry calls it via `onRetry` — both bump the same `restartKey`, which remounts a fresh `ErrorBoundary` (clearing any caught error) and a fresh `Suspense`/`Component` subtree (replaying entrance animations).
+
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `npm run test -- ComponentDetail`
-Expected: PASS (3 tests)
+Expected: PASS (5 tests)
 
 - [ ] **Step 5: Commit**
 
@@ -883,6 +925,7 @@ export function FullPageShowcase({ entry }: { entry: CatalogEntry }) {
     <iframe
       title={entry.name}
       src={`/showcases/${entry.slug}.html`}
+      loading="lazy"
       className="w-full h-screen border-0"
     />
   )
@@ -1031,6 +1074,8 @@ describe('<Name>', () => {
 
 Where `FIXTURE_PROPS` is built by reading the Props interface at the top of the file you just created in Step 1 of each task, and supplying the minimum needed to satisfy any required (non-`?`) fields — most of these components make every prop optional with defaults, so `{}` is often sufficient; where an array of items is required, pass one minimal fixture object matching that item's shape.
 
+`expect(container.firstChild).not.toBeNull()` only catches syntax/import/render-throw errors — strengthen it wherever the component's markup gives you something concrete and free to assert instead: a specific `role`, `aria-label`, visible text, or a `<canvas>`/`<svg>` element. Tasks 10 and 14 below show this (`role="checkbox"`, `role="region"` + `aria-label`); apply the same idea to the others when the extracted file makes it obvious, and fall back to the generic `firstChild` check when it doesn't.
+
 ---
 
 ### Task 10: Port `theme-switch` (v1 → `Switch`)
@@ -1062,14 +1107,14 @@ export default meta
 - [ ] **Step 3:** Write smoke test `index.test.tsx`:
 
 ```tsx
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import Switch from './index'
 
 describe('Switch', () => {
-  it('mounts without throwing', () => {
-    const { container } = render(<Switch />)
-    expect(container.firstChild).not.toBeNull()
+  it('renders the checkbox input that drives the toggle', () => {
+    render(<Switch />)
+    expect(screen.getByRole('checkbox')).toBeInTheDocument()
   })
 })
 ```
@@ -1274,7 +1319,7 @@ export default meta
 - [ ] **Step 4:** Write smoke test with a 3-item fixture (the component's `items` prop requires at least one entry with a `src`):
 
 ```tsx
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import StylishCarousel from './index'
 
@@ -1285,9 +1330,9 @@ const items = [
 ]
 
 describe('StylishCarousel', () => {
-  it('mounts without throwing', () => {
-    const { container } = render(<StylishCarousel items={items} />)
-    expect(container.firstChild).not.toBeNull()
+  it('renders its labeled region with the fixture slides', () => {
+    render(<StylishCarousel items={items} />)
+    expect(screen.getByRole('region', { name: 'Stylish Carousel' })).toBeInTheDocument()
   })
 })
 ```
@@ -1915,6 +1960,7 @@ Run `npm run dev`, then in the browser:
 - Open `/component/theme-switch` (styled-components), `/component/magnetic-dock` (Tailwind/framer, dark stage), and `/component/signature` (opentype.js) — confirm each renders and responds to interaction with no console errors (`read_console_messages`).
 - Open `/component/sticky-scroll-cards` and `/component/collection-surfer` — confirm the stage scrolls instead of clipping.
 - Navigate into and away from `cursor-particle-typography`, `signature`, `magnetic-dock`, and `sticky-scroll-cards` three times each; confirm no console errors accumulate and no runaway animation-frame warnings appear.
+- Rapid-navigation stress test: from the home grid, click into 5–6 different components in quick succession (don't wait for each to fully settle before navigating to the next) — this is a more realistic stress test for lazy-loading races, Suspense timing bugs, and leaked listeners than the paced one-at-a-time checks above. Confirm no console errors and no stuck "Loading…" states.
 - Open `/showcase/koisei-landing` and confirm via `read_network_requests` that no request to `googletagmanager.com` fires.
 - Open `/component/scroll-split-card` and confirm it shows the reference note, not a live carousel.
 - Deliberately break one component temporarily (e.g. throw in `theme-switch`'s render) to confirm the ErrorBoundary fallback + Retry button work, then revert the temporary break.
