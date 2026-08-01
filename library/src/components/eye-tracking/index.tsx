@@ -72,7 +72,7 @@ function Eye({
   showEyelids,
   mouseX,
   mouseY,
-  index,
+  index: _index,
 }: EyeProps) {
   const eyeRef = React.useRef<HTMLDivElement>(null)
   const [isBlinking, setIsBlinking] = React.useState(false)

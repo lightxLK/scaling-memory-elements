@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect, CSSProperties } from 'react';
+import { useRef, useState, useCallback, useEffect, type CSSProperties } from 'react';
 
 type Falloff = 'linear' | 'smooth' | 'sharp';
 
