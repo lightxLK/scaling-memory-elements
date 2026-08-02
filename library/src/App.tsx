@@ -59,6 +59,16 @@ export default function App() {
           </div>
         </header>
         <AppRoutes entries={entries} />
+        <footer className="border-t border-border/80 px-6 py-6 text-center sm:px-10">
+          <a
+            href="https://lightxlk.github.io/"
+            target="_blank"
+            rel="noreferrer"
+            className="font-mono text-[0.68rem] tracking-[0.1em] text-muted-foreground transition-colors hover:text-accent"
+          >
+            Curated by Lokesh
+          </a>
+        </footer>
       </div>
     </HashRouter>
   )
