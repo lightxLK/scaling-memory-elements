@@ -244,20 +244,17 @@ export function CursorDrivenParticleTypography({
             attributeFilter: ["class"]
         });
 
+        const handleTouchMove = (e: TouchEvent) => {
+            if (!e.touches[0]) return;
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.touches[0].clientX - rect.left;
+            mouseY = e.touches[0].clientY - rect.top;
+        };
+
         canvas.addEventListener("mousemove", handleMouseMove);
         canvas.addEventListener("mouseleave", handleMouseLeave);
-        canvas.addEventListener("touchstart", (e) => {
-            if (!e.touches[0]) return;
-            const rect = canvas.getBoundingClientRect();
-            mouseX = e.touches[0].clientX - rect.left;
-            mouseY = e.touches[0].clientY - rect.top;
-        });
-        canvas.addEventListener("touchmove", (e) => {
-            if (!e.touches[0]) return;
-            const rect = canvas.getBoundingClientRect();
-            mouseX = e.touches[0].clientX - rect.left;
-            mouseY = e.touches[0].clientY - rect.top;
-        });
+        canvas.addEventListener("touchstart", handleTouchMove);
+        canvas.addEventListener("touchmove", handleTouchMove);
         canvas.addEventListener("touchend", handleMouseLeave);
 
         return () => {
@@ -266,6 +263,9 @@ export function CursorDrivenParticleTypography({
             themeObserver.disconnect();
             canvas.removeEventListener("mousemove", handleMouseMove);
             canvas.removeEventListener("mouseleave", handleMouseLeave);
+            canvas.removeEventListener("touchstart", handleTouchMove);
+            canvas.removeEventListener("touchmove", handleTouchMove);
+            canvas.removeEventListener("touchend", handleMouseLeave);
             cancelAnimationFrame(animationFrameId);
         };
     }, [text, fontSize, fontFamily, particleSize, particleDensity, dispersionStrength, returnSpeed, color]);

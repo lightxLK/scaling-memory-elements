@@ -35,6 +35,8 @@ jobs:
       # packages), so npm ci's exact-match check rejects it on this runner.
       # npm install resolves whatever the current platform actually needs.
       - run: npm install
+      - run: npm run lint
+      - run: npm test
       - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

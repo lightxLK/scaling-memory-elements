@@ -129,7 +129,10 @@ const StylishCarousel = ({
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
     const delta = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(delta) > 40) delta > 0 ? toNext() : toPrev();
+    if (Math.abs(delta) > 40) {
+      if (delta > 0) toNext();
+      else toPrev();
+    }
     touchStartX.current = null;
   };
 

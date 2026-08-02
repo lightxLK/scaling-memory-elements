@@ -7,13 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Cursor Particle Typography no longer leaks `touchstart`/`touchmove` listeners on the canvas:
+  they were registered as inline anonymous functions and never removed, so every effect re-run
+  (any prop change) stacked a duplicate pair.
+- Stylish Carousel's swipe handler used a ternary purely for its side effect; rewritten as an
+  explicit `if`/`else`.
+
 ### Changed
 
 - Replaced em dashes with hyphens across the site and codebase (copy, comments, docs).
+- CI now runs `lint` and `test` before `build` on every deploy.
+- Rewrote README to the project's documentation standard (stack, structure, scripts, deploy).
 
 ### Removed
 
 - Vite's default favicon (`public/favicon.svg`) and its `<link>` in `index.html`.
+
+### Known Issues
+
+- `react-router` has a high-severity advisory (CSRF bypass in RSC mode,
+  GHSA-qwww-vcr4-c8h2). This app is a client-only SPA with no RSC usage, so it isn't
+  exploitable here; a fix requires a major-version bump not yet available as a non-breaking
+  patch. Tracked, not auto-upgraded.
 
 ## [0.3.0] - 2026-08-02
 
