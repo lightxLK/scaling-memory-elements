@@ -27,10 +27,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: library/package-lock.json
-      - run: npm ci
+      # npm ci fails here: the lockfile was generated on Windows and is missing
+      # Linux-only optional native binaries (rolldown-vite's platform binding
+      # packages), so npm ci's exact-match check rejects it on this runner.
+      # npm install resolves whatever the current platform actually needs.
+      - run: npm install
       - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
