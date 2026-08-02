@@ -3,6 +3,7 @@ import { getCatalog, type CatalogEntry } from '@/catalog'
 import { Home } from '@/pages/Home'
 import { ComponentDetail } from '@/pages/ComponentDetail'
 import { FullPageShowcase } from '@/pages/FullPageShowcase'
+import { Changelog } from '@/pages/Changelog'
 import ThemeSwitch from '@/components/theme-switch'
 
 function DetailRoute({ entries }: { entries: CatalogEntry[] }) {
@@ -25,6 +26,7 @@ export function AppRoutes({ entries }: { entries: CatalogEntry[] }) {
       <Route path="/" element={<Home entries={entries} />} />
       <Route path="/component/:slug" element={<DetailRoute entries={entries} />} />
       <Route path="/showcase/:slug" element={<ShowcaseRoute entries={entries} />} />
+      <Route path="/changelog" element={<Changelog />} />
     </Routes>
   )
 }
@@ -48,6 +50,12 @@ export default function App() {
               <span className="hidden font-mono text-[0.7rem] tracking-[0.15em] text-muted-foreground sm:block">
                 {String(runnableCount).padStart(2, '0')} SPECIMENS CATALOGUED
               </span>
+              <Link
+                to="/changelog"
+                className="font-mono text-[0.7rem] tracking-[0.15em] text-muted-foreground transition-colors hover:text-accent"
+              >
+                CHANGELOG
+              </Link>
               {/* theme-switch hardcodes --toggle-size: 30px on its own root, which
                   shadows any inherited override — scale the whole thing down instead. */}
               <div className="relative shrink-0" style={{ width: 63, height: 28, overflow: 'hidden' }}>
