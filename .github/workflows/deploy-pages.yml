@@ -1,10 +1,20 @@
-name: Deploy library to GitHub Pages
+name: Deploy specimen to GitHub Pages
 
 on:
   push:
     branches: [master]
     paths:
-      - 'library/**'
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - 'vitest.config.ts'
+      - 'tailwind.config.ts'
+      - 'postcss.config.js'
+      - 'tsconfig*.json'
+      - '.oxlintrc.json'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
@@ -20,16 +30,13 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: library
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: library/package-lock.json
+          cache-dependency-path: package-lock.json
       # npm ci fails here: the lockfile was generated on Windows and is missing
       # Linux-only optional native binaries (rolldown-vite's platform binding
       # packages), so npm ci's exact-match check rejects it on this runner.
@@ -41,7 +48,7 @@ jobs:
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: library/dist
+          path: dist
 
   deploy:
     needs: build
