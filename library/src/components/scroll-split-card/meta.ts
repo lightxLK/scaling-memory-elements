@@ -10,10 +10,10 @@ const meta: ComponentMeta = {
   deps: ['framer-motion'],
   runnable: true,
   // Standalone mode already builds its own fixed-height, scrollbar-hidden
-  // scroll container — leaving this true double-wraps it in the preview
+  // scroll container - leaving this true double-wraps it in the preview
   // stage's own (visible-scrollbar) overflow-y-auto box.
   scrollable: false,
-  notes: 'Original shadcn-distributed source was never captured (see raw-misc/v9.txt) — this is a fresh implementation built from the captured usage example (containerRef, imageSrc, cards props).',
+  notes: 'Original shadcn-distributed source was never captured (see raw-misc/v9.txt) - this is a fresh implementation built from the captured usage example (containerRef, imageSrc, cards props).',
 }
 
 export default meta

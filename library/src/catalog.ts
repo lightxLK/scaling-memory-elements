@@ -6,7 +6,7 @@ export interface CatalogEntry extends ComponentMeta {
   getSource: () => Promise<string>
 }
 
-// Left untyped deliberately — import.meta.glob's inferred shape varies across
+// Left untyped deliberately - import.meta.glob's inferred shape varies across
 // Vite versions. Values are validated by usage below (mod.default) rather than
 // leaned on at the type level.
 const metaModules = import.meta.glob('./components/*/meta.ts', { eager: true }) as Record<string, { default: ComponentMeta }>

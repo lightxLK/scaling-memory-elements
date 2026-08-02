@@ -43,7 +43,7 @@ export default function App() {
         <header className="sticky top-0 z-40 border-b border-border/80 bg-background/85 backdrop-blur">
           <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6 py-4 sm:px-10">
             <Link to="/" className="group flex items-baseline gap-3">
-              <span className="font-mono text-[0.7rem] tracking-[0.2em] text-accent">SPC—01</span>
+              <span className="font-mono text-[0.7rem] tracking-[0.2em] text-accent">SPC-01</span>
               <span className="text-lg font-semibold tracking-tight text-foreground transition-colors group-hover:text-accent">
                 Specimen
               </span>
@@ -59,7 +59,7 @@ export default function App() {
                 CHANGELOG
               </Link>
               {/* theme-switch hardcodes --toggle-size: 30px on its own root, which
-                  shadows any inherited override — scale the whole thing down instead. */}
+                  shadows any inherited override - scale the whole thing down instead. */}
               <div className="relative shrink-0" style={{ width: 63, height: 28, overflow: 'hidden' }}>
                 <div style={{ transform: 'scale(0.373)', transformOrigin: 'top left' }}>
                   <ThemeSwitch />

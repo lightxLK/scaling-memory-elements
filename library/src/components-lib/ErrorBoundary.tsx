@@ -24,7 +24,7 @@ export class ErrorBoundary extends Component<Props, State> {
           {/* Uses opacity on the inherited color rather than a fixed token,
               since this renders on both the light and dark preview stage. */}
           <p className="font-mono text-[0.68rem] tracking-[0.08em] opacity-60">
-            SPECIMEN FAILED — {this.props.slug}
+            SPECIMEN FAILED - {this.props.slug}
           </p>
           <p className="mt-2 text-sm text-red-500">{this.state.error.message}</p>
           <button

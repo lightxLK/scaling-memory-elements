@@ -12,7 +12,7 @@ export function Home({ entries }: { entries: CatalogEntry[] }) {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<Category | 'All'>('All')
 
-  // Sorted here even though getCatalog() already returns alphabetical order —
+  // Sorted here even though getCatalog() already returns alphabetical order -
   // Home takes entries as a plain prop specifically so it doesn't depend on
   // that upstream guarantee (matches the isolation goal from the design doc:
   // a unit's correctness shouldn't rely on an assumption about its caller).
@@ -29,7 +29,7 @@ export function Home({ entries }: { entries: CatalogEntry[] }) {
           A working index of interaction components.
         </h1>
         <p className="mt-3 text-[0.95rem] leading-relaxed text-muted-foreground">
-          Every specimen below is live, running source — hover, drag, and scroll it before you take it apart.
+          Every specimen below is live, running source - hover, drag, and scroll it before you take it apart.
         </p>
       </div>
 

@@ -15,7 +15,7 @@ export function applyTheme(theme: Theme) {
   try {
     localStorage.setItem(STORAGE_KEY, theme)
   } catch {
-    // localStorage unavailable (privacy mode, etc.) — theme still applies via DOM class
+    // localStorage unavailable (privacy mode, etc.) - theme still applies via DOM class
   }
 }
 

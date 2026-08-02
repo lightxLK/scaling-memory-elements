@@ -79,7 +79,7 @@ export function Changelog() {
             </div>
 
             {release.sections.length === 0 ? (
-              <p className="mt-3 font-mono text-sm text-muted-foreground">Nothing yet — check back soon.</p>
+              <p className="mt-3 font-mono text-sm text-muted-foreground">Nothing yet - check back soon.</p>
             ) : (
               release.sections.map((section) => <Section key={section.type} section={section} />)
             )}

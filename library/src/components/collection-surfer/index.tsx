@@ -104,11 +104,11 @@ export function CollectionSurfer({ items = ITEMS, variant = "magnetic" }: Collec
                 Wraps the sticky viewport so it has room to stay pinned while
                 scrolling. Make this huge so the user can scroll for a very
                 long time (e.g., 50,000px). The sticky panel must be a CHILD
-                of this spacer (not a sibling after it) — otherwise its
+                of this spacer (not a sibling after it) - otherwise its
                 static position starts 50,000px down and never scrolls into
                 view. */}
             <div style={{ height: "50000px" }} className="relative w-full">
-                {/* Sticky viewport — pinned to the scroll container above, not the browser window */}
+                {/* Sticky viewport - pinned to the scroll container above, not the browser window */}
                 <div
                     className="sticky top-0 w-full overflow-hidden flex items-center justify-center perspective-container"
                     style={{ height: `${STAGE_HEIGHT}px` }}

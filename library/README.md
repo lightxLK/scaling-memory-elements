@@ -33,6 +33,6 @@ See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rule
 
 ## Developer Tools
 
-- **`Alt+Shift+L+K`** (`⌥⇧LK` on macOS) — hidden shortcut that opens the author's site
+- **`Alt+Shift+L+K`** (`⌥⇧LK` on macOS) - hidden shortcut that opens the author's site
   (https://lightxlk.github.io/) in a new tab. Ignored while focus is inside an input, textarea,
   or contenteditable element. See `src/components-lib/DeveloperEasterEgg.tsx`.

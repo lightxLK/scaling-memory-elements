@@ -24,7 +24,7 @@ describe('ErrorBoundary', () => {
         <Bomb shouldThrow={true} />
       </ErrorBoundary>
     )
-    expect(screen.getByText(/SPECIMEN FAILED — test-slug/i)).toBeInTheDocument()
+    expect(screen.getByText(/SPECIMEN FAILED - test-slug/i)).toBeInTheDocument()
     expect(screen.getByText(/boom/i)).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /retry/i }))
     expect(onRetry).toHaveBeenCalledTimes(1)

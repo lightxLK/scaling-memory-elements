@@ -1,4 +1,4 @@
-// Hover Image Reveal — Originkit
+// Hover Image Reveal - Originkit
 // Using component defaults.
 
 "use client";

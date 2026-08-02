@@ -151,7 +151,7 @@ const SpecularButton = ({
       renderer = new Renderer({ alpha: true, premultipliedAlpha: true, antialias: true, dpr });
     } catch {
       // WebGL unavailable (old GPU, privacy mode, disabled in browser settings,
-      // or no getContext support in the current environment) — the button
+      // or no getContext support in the current environment) - the button
       // still works, it just renders without the specular highlight.
       return;
     }

@@ -43,7 +43,7 @@ const addKeysToTokens = (lines: ThemedToken[][]): KeyedLine[] =>
 
 // Shiki's dual-theme output puts the dark-mode color/background in
 // `htmlStyle` as plain CSS-variable values (e.g. `--shiki-dark: "#F97583"`),
-// meant to be read directly — not set as a literal CSS custom property and
+// meant to be read directly - not set as a literal CSS custom property and
 // picked up via a `dark:` variant, which doesn't reliably apply here.
 const TokenSpan = ({ token, isDark }: { token: ThemedToken; isDark: boolean }) => {
   const darkColor = token.htmlStyle?.['--shiki-dark'] as string | undefined
@@ -217,7 +217,7 @@ const CodeBlockBody = memo(
     className?: string
   }) => {
     // Shiki's own root bg/fg are compound CSS strings meant for raw HTML
-    // interpolation (e.g. "#fff;--shiki-dark-bg:#24292e") — invalid as a
+    // interpolation (e.g. "#fff;--shiki-dark-bg:#24292e") - invalid as a
     // React style value. The container already tracks the site theme via
     // bg-background/text-foreground, so just inherit that instead.
     const isDark = useIsDarkTheme()
@@ -295,7 +295,7 @@ export const CodeBlockContent = ({
 }) => {
   const rawTokens = useMemo(() => createRawTokens(code), [code])
 
-  // Synchronous cache lookup — avoids setState in effect for cached results
+  // Synchronous cache lookup - avoids setState in effect for cached results
   const syncTokens = useMemo(() => highlightCode(code, language) ?? rawTokens, [code, language, rawTokens])
 
   const [asyncTokens, setAsyncTokens] = useState<TokenizedCode | null>(null)

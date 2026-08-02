@@ -3,7 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  /* dark is the default palette — matches the app's default theme */
+  /* dark is the default palette - matches the app's default theme */
   --color-foreground: #f2f0ea;
   --color-muted-foreground: #948c7d;
   --color-background: #0d0c0b;
@@ -38,7 +38,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Scroll stays functional (wheel/keyboard/touch) — just hide the native
+/* Scroll stays functional (wheel/keyboard/touch) - just hide the native
    browser scrollbar chrome, site-wide. */
 html {
   scrollbar-width: none;

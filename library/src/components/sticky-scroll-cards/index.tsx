@@ -32,10 +32,10 @@ const DEFAULT_CARDS: StickyScrollCardItem[] = [
   },
 ];
 
-// Very subtle tilts — natural scatter without looking messy
+// Very subtle tilts - natural scatter without looking messy
 const CARD_ROTATIONS = [-1.4, 1.0, -0.8, 1.6, -1.1];
 
-// Fixed viewport height for the self-contained scroll stage — the sticky
+// Fixed viewport height for the self-contained scroll stage - the sticky
 // cards pin to this box instead of the browser viewport (h-screen/vh units
 // escape a bounded preview card and drive scroll off the whole page).
 const STAGE_HEIGHT = 640;
@@ -88,7 +88,7 @@ function StickyScrollCard({
           </div>
         </div>
 
-        {/* Caption strip — trimmed height */}
+        {/* Caption strip - trimmed height */}
         <div className="flex h-[44px] items-center justify-center px-4">
           <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-400">
             {title}

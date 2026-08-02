@@ -72,7 +72,7 @@ export function ComponentDetail({ entry }: { entry: CatalogEntry }) {
   // Most specimens have no fixed backdrop requirement, so their preview stage
   // follows the site-wide theme switcher. A few (e.g. glowing/light-on-dark
   // components) declare an explicit `background` because they need that
-  // backdrop to read correctly regardless of theme — that overrides the toggle.
+  // backdrop to read correctly regardless of theme - that overrides the toggle.
   const stageBg = entry.background ?? (isDark ? 'dark' : 'light')
 
   async function selectTab(next: Tab) {

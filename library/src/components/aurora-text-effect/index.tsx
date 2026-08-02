@@ -181,7 +181,7 @@ export function AuroraTextEffect({
 
 // AuroraTextEffect requires a `text` prop, so the catalog (which renders
 // `<Component />` with no props) gets this small default-configured demo
-// instead of the bare export. The component itself is unmodified above —
+// instead of the bare export. The component itself is unmodified above -
 // wrapping it in a locally-scoped `.dark` container (rather than overriding
 // its className/textClassName) is what makes its own dark:bg-black,
 // dark:text-white, and dark:mix-blend-darken apply consistently regardless
