@@ -2,8 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { motion, useScroll, useTransform } from "framer-motion";
-import ReactLenis from "lenis/react";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 export interface StickyScrollCardItem {
   title: string;
@@ -36,6 +35,11 @@ const DEFAULT_CARDS: StickyScrollCardItem[] = [
 // Very subtle tilts — natural scatter without looking messy
 const CARD_ROTATIONS = [-1.4, 1.0, -0.8, 1.6, -1.1];
 
+// Fixed viewport height for the self-contained scroll stage — the sticky
+// cards pin to this box instead of the browser viewport (h-screen/vh units
+// escape a bounded preview card and drive scroll off the whole page).
+const STAGE_HEIGHT = 640;
+
 interface StickyScrollCardProps {
   i: number;
   title: string;
@@ -57,12 +61,15 @@ function StickyScrollCard({
   const rotation = CARD_ROTATIONS[i % CARD_ROTATIONS.length];
 
   return (
-    <div className="sticky top-0 flex h-screen items-center justify-center">
+    <div
+      className="sticky top-0 flex items-center justify-center"
+      style={{ height: STAGE_HEIGHT }}
+    >
       <motion.div
         style={{
           scale,
           rotate: rotation,
-          top: `calc(-5vh + ${i * 22 + 160}px)`,
+          top: `calc(${-STAGE_HEIGHT * 0.05}px + ${i * 22 + 160}px)`,
           borderRadius: 4,
           boxShadow:
             "0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.07), 0 12px 32px rgba(0,0,0,0.10), 0 24px 56px rgba(0,0,0,0.08)",
@@ -106,32 +113,27 @@ export function StickyScrollCards({
   hint = "scroll to explore",
   className,
 }: StickyScrollCardsProps) {
-  const container = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const targetRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
-    target: container,
+    container: scrollRef,
+    target: targetRef,
     offset: ["start start", "end end"],
   });
 
-  // Hide the native scrollbar while this component is mounted
-  useEffect(() => {
-    const style = document.createElement("style");
-    style.id = "__sticky-scroll-cards-no-bar";
-    style.textContent =
-      "html { scrollbar-width: none; -ms-overflow-style: none; } html::-webkit-scrollbar { display: none; }";
-    document.head.appendChild(style);
-    return () => {
-      document.getElementById("__sticky-scroll-cards-no-bar")?.remove();
-    };
-  }, []);
-
   return (
-    <ReactLenis root>
+    <div
+      ref={scrollRef}
+      className="relative w-full overflow-y-auto overflow-x-hidden rounded-md"
+      style={{ height: STAGE_HEIGHT }}
+    >
       <main
-        ref={container}
+        ref={targetRef}
         className={cn(
-          "relative flex w-full flex-col items-center justify-center pb-[100vh] pt-[50vh]",
+          "relative flex w-full flex-col items-center justify-center",
           className
         )}
+        style={{ paddingBottom: STAGE_HEIGHT, paddingTop: STAGE_HEIGHT / 2 }}
       >
         {/* Hint label */}
         <div className="absolute left-1/2 top-[8%] flex -translate-x-1/2 flex-col items-center gap-3">
@@ -155,7 +157,7 @@ export function StickyScrollCards({
           );
         })}
       </main>
-    </ReactLenis>
+    </div>
   );
 }
 

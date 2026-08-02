@@ -5,11 +5,11 @@ const meta: ComponentMeta = {
   name: 'Sticky Scroll Cards',
   description: 'Scroll-pinned image cards that stack and scale down as you scroll past them.',
   category: 'Scrolling',
-  tags: ['scroll', 'sticky', 'cards', 'lenis'],
+  tags: ['scroll', 'sticky', 'cards'],
   family: 'componentry',
-  deps: ['framer-motion', 'lenis'],
-  previewHeight: 900,
-  scrollable: true,
+  deps: ['framer-motion'],
+  previewHeight: 720,
+  scrollable: false,
   runnable: true,
 }
 
