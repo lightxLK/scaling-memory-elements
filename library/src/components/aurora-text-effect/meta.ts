@@ -10,6 +10,7 @@ const meta: ComponentMeta = {
   deps: [],
   runnable: true,
   background: 'dark',
+  previewHeight: 420,
 }
 
 export default meta

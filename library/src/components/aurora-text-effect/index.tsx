@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/components/lib/utils";
 
 export interface AuroraTextEffectProps {
   text: string;
@@ -181,25 +181,28 @@ export function AuroraTextEffect({
 
 // AuroraTextEffect requires a `text` prop, so the catalog (which renders
 // `<Component />` with no props) gets this small default-configured demo
-// instead of the bare export.
+// instead of the bare export. The component itself is unmodified above —
+// wrapping it in a locally-scoped `.dark` container (rather than overriding
+// its className/textClassName) is what makes its own dark:bg-black,
+// dark:text-white, and dark:mix-blend-darken apply consistently regardless
+// of the site's global theme, and h-full/w-full is what makes that black
+// background actually fill the preview stage instead of just the text's
+// own content box.
 export default function AuroraTextEffectDemo() {
   return (
-    <AuroraTextEffect
-      text="Aurora Effect"
-      // Force a solid black backdrop (matching the preview stage, which is
-      // pinned dark for this component) instead of the light/dark-toggled
-      // default — the glow layers need a dark backdrop to read correctly.
-      // Text color is forced to match, since the default is theme-toggled too.
-      className="bg-black"
-      textClassName="text-white"
-      fontSize="clamp(3rem, 8vw, 7rem)"
-      colors={{
-        first: "bg-cyan-400",
-        second: "bg-yellow-400",
-        third: "bg-green-400",
-        fourth: "bg-fuchsia-400",
-      }}
-      blurAmount="blur-lg"
-    />
+    <div className="dark h-[420px] w-full">
+      <AuroraTextEffect
+        text="Aurora Effect"
+        className="h-full w-full"
+        fontSize="clamp(3rem, 8vw, 7rem)"
+        colors={{
+          first: "bg-cyan-400",
+          second: "bg-yellow-400",
+          third: "bg-green-400",
+          fourth: "bg-fuchsia-400",
+        }}
+        blurAmount="blur-lg"
+      />
+    </div>
   );
 }
