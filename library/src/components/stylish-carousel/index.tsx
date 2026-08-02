@@ -58,8 +58,16 @@ export interface StylishCarouselProps {
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
+const DEFAULT_ITEMS: StylishCarouselItem[] = [
+  { src: "https://picsum.photos/seed/stylish-carousel-1/600/600", title: "Aurora" },
+  { src: "https://picsum.photos/seed/stylish-carousel-2/600/600", title: "Basalt" },
+  { src: "https://picsum.photos/seed/stylish-carousel-3/600/600", title: "Cascade" },
+  { src: "https://picsum.photos/seed/stylish-carousel-4/600/600", title: "Drift" },
+  { src: "https://picsum.photos/seed/stylish-carousel-5/600/600", title: "Ember" },
+];
+
 const StylishCarousel = ({
-  items = [],
+  items = DEFAULT_ITEMS,
   initialIndex = 0,
   slideSize = "clamp(140px, 75vmin, 320px)",
   rotationDegrees = 28,

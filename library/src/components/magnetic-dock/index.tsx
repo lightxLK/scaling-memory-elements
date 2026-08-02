@@ -224,8 +224,18 @@ function DockItem({
     )
 }
 
+const DEFAULT_ITEMS: DockItemData[] = [
+    { id: "home", label: "Home", icon: <DockIconHome /> },
+    { id: "search", label: "Search", icon: <DockIconSearch /> },
+    { id: "folder", label: "Files", icon: <DockIconFolder /> },
+    { id: "mail", label: "Mail", icon: <DockIconMail /> },
+    { id: "music", label: "Music", icon: <DockIconMusic /> },
+    { id: "settings", label: "Settings", icon: <DockIconSettings /> },
+    { id: "trash", label: "Trash", icon: <DockIconTrash /> },
+]
+
 function MagneticDock({
-    items,
+    items = DEFAULT_ITEMS,
     iconSize = 56,
     maxScale = 1.5,
     magneticDistance = 150,

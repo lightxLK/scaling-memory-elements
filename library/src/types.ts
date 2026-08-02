@@ -9,6 +9,7 @@ export type Category =
   | '3D'
   | 'Toggle'
   | 'Showcase'
+  | 'Code'
 
 export type Family = 'react-bits' | 'componentry' | 'misc' | 'full-page'
 

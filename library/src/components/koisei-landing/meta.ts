@@ -8,7 +8,8 @@ const meta: ComponentMeta = {
   tags: ['parallax', 'gsap', 'three.js', 'lenis', 'full-page'],
   family: 'full-page',
   deps: ['gsap', 'three', 'lenis'],
-  runnable: true,
+  runnable: false,
+  notes: 'Not yet ported into the library — source lives outside this repo.',
 }
 
 export default meta

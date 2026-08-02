@@ -1,8 +1,9 @@
-import { BrowserRouter, Routes, Route, Link, useParams } from 'react-router-dom'
+import { HashRouter, Routes, Route, Link, useParams } from 'react-router-dom'
 import { getCatalog, type CatalogEntry } from '@/catalog'
 import { Home } from '@/pages/Home'
 import { ComponentDetail } from '@/pages/ComponentDetail'
 import { FullPageShowcase } from '@/pages/FullPageShowcase'
+import ThemeSwitch from '@/components/theme-switch'
 
 function DetailRoute({ entries }: { entries: CatalogEntry[] }) {
   const { slug } = useParams()
@@ -30,14 +31,35 @@ export function AppRoutes({ entries }: { entries: CatalogEntry[] }) {
 
 export default function App() {
   const entries = getCatalog()
+  const runnableCount = entries.filter((e) => e.runnable).length
+
   return (
-    <BrowserRouter>
-      <div className="min-h-screen">
-        <header className="border-b p-4">
-          <Link to="/" className="font-bold text-lg">Component Library</Link>
+    <HashRouter>
+      <div className="min-h-screen bg-background text-foreground">
+        <header className="sticky top-0 z-40 border-b border-border/80 bg-background/85 backdrop-blur">
+          <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6 py-4 sm:px-10">
+            <Link to="/" className="group flex items-baseline gap-3">
+              <span className="font-mono text-[0.7rem] tracking-[0.2em] text-accent">SPC—01</span>
+              <span className="text-lg font-semibold tracking-tight text-foreground transition-colors group-hover:text-accent">
+                Specimen
+              </span>
+            </Link>
+            <div className="flex items-center gap-4">
+              <span className="hidden font-mono text-[0.7rem] tracking-[0.15em] text-muted-foreground sm:block">
+                {String(runnableCount).padStart(2, '0')} SPECIMENS CATALOGUED
+              </span>
+              {/* theme-switch hardcodes --toggle-size: 30px on its own root, which
+                  shadows any inherited override — scale the whole thing down instead. */}
+              <div className="relative shrink-0" style={{ width: 63, height: 28, overflow: 'hidden' }}>
+                <div style={{ transform: 'scale(0.373)', transformOrigin: 'top left' }}>
+                  <ThemeSwitch />
+                </div>
+              </div>
+            </div>
+          </div>
         </header>
         <AppRoutes entries={entries} />
       </div>
-    </BrowserRouter>
+    </HashRouter>
   )
 }

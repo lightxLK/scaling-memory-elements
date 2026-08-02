@@ -25,7 +25,7 @@ describe('Home', () => {
 
   it('filters by category', () => {
     render(<MemoryRouter><Home entries={entries} /></MemoryRouter>)
-    fireEvent.change(screen.getByLabelText(/category/i), { target: { value: 'Hover' } })
+    fireEvent.click(screen.getByRole('button', { name: 'HOVER' }))
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(1)
     expect(screen.getByText('Hover Image Reveal')).toBeInTheDocument()
   })

@@ -1,10 +1,24 @@
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { applyTheme, getInitialTheme, type Theme } from '@/lib/theme';
 
 const Switch = () => {
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
+
   return (
     <StyledWrapper>
       <label className="theme-switch">
-        <input type="checkbox" className="theme-switch__checkbox" />
+        <input
+          type="checkbox"
+          className="theme-switch__checkbox"
+          checked={theme === 'dark'}
+          onChange={(e) => setTheme(e.target.checked ? 'dark' : 'light')}
+          aria-label="Toggle dark mode"
+        />
         <div className="theme-switch__container">
           <div className="theme-switch__clouds" />
           <div className="theme-switch__stars-container">
@@ -67,8 +81,6 @@ const StyledWrapper = styled.div`
     border-radius: var(--container-radius);
     overflow: hidden;
     cursor: pointer;
-    -webkit-box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
-    box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
     -webkit-transition: var(--transition);
     -o-transition: var(--transition);
     transition: var(--transition);
@@ -97,8 +109,6 @@ const StyledWrapper = styled.div`
     left: var(--circle-container-offset);
     top: var(--circle-container-offset);
     border-radius: var(--container-radius);
-    -webkit-box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
-    box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;

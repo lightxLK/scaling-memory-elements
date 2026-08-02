@@ -8,8 +8,8 @@ const meta: ComponentMeta = {
   tags: ['scroll', 'gallery', 'magnetic', 'parallax'],
   family: 'componentry',
   deps: ['framer-motion'],
-  previewHeight: 900,
-  scrollable: true,
+  previewHeight: 720,
+  scrollable: false,
   runnable: true,
 }
 

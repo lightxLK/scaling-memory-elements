@@ -59,7 +59,10 @@ export function Signature({
 
         for (const path of fontPaths) {
           try {
-            font = await opentype.load(path as string);
+            const response = await fetch(path as string);
+            if (!response.ok) continue;
+            const buffer = await response.arrayBuffer();
+            font = opentype.parse(buffer);
             break;
           } catch {
             // Try next path

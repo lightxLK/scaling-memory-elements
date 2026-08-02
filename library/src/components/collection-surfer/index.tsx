@@ -36,6 +36,11 @@ interface CollectionSurferProps {
     variant?: CollectionSurferVariant;
 }
 
+// Fixed viewport height for the self-contained scroll stage. The panel is
+// `sticky` (not `fixed`) so it stays pinned to this box instead of escaping
+// to the browser viewport when embedded inside a scrollable preview card.
+const STAGE_HEIGHT = 640;
+
 export function CollectionSurfer({ items = ITEMS, variant = "magnetic" }: CollectionSurferProps) {
     // 1. Loop Setup: Duplicate items to create a buffer
     // We render the list twice: [Original Set, Duplicate Set]
@@ -48,7 +53,8 @@ export function CollectionSurfer({ items = ITEMS, variant = "magnetic" }: Collec
     // The exact scroll distance to complete one full loop of the ORIGINAL items
     const loopDistance = items.length * scrollPerItem;
 
-    const { scrollY } = useScroll();
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const { scrollY } = useScroll({ container: scrollRef });
 
     const smoothScroll = useSpring(scrollY, {
         mass: 0.1,
@@ -89,18 +95,26 @@ export function CollectionSurfer({ items = ITEMS, variant = "magnetic" }: Collec
     };
 
     return (
-        <div className="relative bg-black min-h-screen text-white w-full">
+        <div
+            ref={scrollRef}
+            className="relative bg-black text-white w-full overflow-y-auto overflow-x-hidden rounded-md"
+            style={{ height: `${STAGE_HEIGHT}px` }}
+        >
             {/* 3. Infinite Spacer:
-                We make this huge so the user can scroll for a very long time.
-                (e.g., 50,000px) */}
-            <div style={{ height: "50000px" }} className="w-full" />
-
-            {/* Fixed viewport */}
-            <div
-                className="fixed inset-0 w-full h-screen overflow-hidden flex items-center justify-center perspective-container"
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-            >
+                Wraps the sticky viewport so it has room to stay pinned while
+                scrolling. Make this huge so the user can scroll for a very
+                long time (e.g., 50,000px). The sticky panel must be a CHILD
+                of this spacer (not a sibling after it) — otherwise its
+                static position starts 50,000px down and never scrolls into
+                view. */}
+            <div style={{ height: "50000px" }} className="relative w-full">
+                {/* Sticky viewport — pinned to the scroll container above, not the browser window */}
+                <div
+                    className="sticky top-0 w-full overflow-hidden flex items-center justify-center perspective-container"
+                    style={{ height: `${STAGE_HEIGHT}px` }}
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={handleMouseLeave}
+                >
 
                 {/* UI Overlays */}
                 <div className="absolute top-[3vw] left-[3vw] z-50 pointer-events-none mix-blend-difference">
@@ -152,6 +166,7 @@ export function CollectionSurfer({ items = ITEMS, variant = "magnetic" }: Collec
                             />
                         ))}
                     </motion.div>
+                </div>
                 </div>
             </div>
         </div>

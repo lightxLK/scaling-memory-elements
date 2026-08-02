@@ -20,14 +20,18 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.error) {
       return (
-        <div role="alert" className="p-6 text-center">
-          <p className="font-semibold">Component crashed: {this.props.slug}</p>
-          <p className="text-sm text-red-500 mt-1">{this.state.error.message}</p>
+        <div role="alert" className="p-10 text-center text-current">
+          {/* Uses opacity on the inherited color rather than a fixed token,
+              since this renders on both the light and dark preview stage. */}
+          <p className="font-mono text-[0.68rem] tracking-[0.08em] opacity-60">
+            SPECIMEN FAILED — {this.props.slug}
+          </p>
+          <p className="mt-2 text-sm text-red-500">{this.state.error.message}</p>
           <button
             onClick={this.props.onRetry}
-            className="mt-3 px-3 py-1 rounded bg-neutral-800 text-white"
+            className="mt-4 rounded-full border border-current/20 px-3 py-1 font-mono text-[0.68rem] tracking-[0.06em] opacity-60 transition-opacity hover:opacity-100"
           >
-            Retry
+            RETRY
           </button>
         </div>
       )

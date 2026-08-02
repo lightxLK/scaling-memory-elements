@@ -17,7 +17,7 @@ interface GithubContributionData {
 }
 
 interface GithubCalendarProps {
-    username: string
+    username?: string
     variant?: "default" | "city-lights" | "minimal"
     shape?: "square" | "rounded" | "circle" | "squircle"
     glowIntensity?: number
@@ -96,8 +96,16 @@ function getShapeClass(shape: string) {
     }
 }
 
+const LEVEL_NAMES: ContributionDay["contributionLevel"][] = [
+    "NONE",
+    "FIRST_QUARTILE",
+    "SECOND_QUARTILE",
+    "THIRD_QUARTILE",
+    "FOURTH_QUARTILE",
+]
+
 export function GithubCalendar({
-    username,
+    username = "lightxLK",
     variant = "default",
     shape = "rounded",
     glowIntensity = 5,
@@ -117,13 +125,43 @@ export function GithubCalendar({
             try {
                 setLoading(true)
                 const response = await fetch(
-                    `https://github-contributions-api.deno.dev/${username}.json`
+                    `https://github-contributions-api.jogruber.de/v4/${username}?y=last`
                 )
                 if (!response.ok) {
                     throw new Error("Failed to fetch GitHub data")
                 }
-                const jsonData = await response.json()
-                setData(jsonData)
+                const jsonData: {
+                    total: Record<string, number>
+                    contributions: { date: string; count: number; level: number }[]
+                } = await response.json()
+
+                // API returns a flat day list; regroup into Sunday-start weeks
+                // (padding the first week with empty days) to match the grid below.
+                const flat = jsonData.contributions
+                const firstDow = new Date(flat[0].date).getDay()
+                const padding: ContributionDay[] = Array.from({ length: firstDow }, (_, i) => ({
+                    date: `pad-${i}`,
+                    contributionCount: 0,
+                    contributionLevel: "NONE",
+                    color: "",
+                }))
+                const days: ContributionDay[] = [
+                    ...padding,
+                    ...flat.map((d) => ({
+                        date: d.date,
+                        contributionCount: d.count,
+                        contributionLevel: LEVEL_NAMES[d.level] ?? "NONE",
+                        color: "",
+                    })),
+                ]
+
+                const weeks: ContributionDay[][] = []
+                for (let i = 0; i < days.length; i += 7) {
+                    weeks.push(days.slice(i, i + 7))
+                }
+
+                const totalContributions = Object.values(jsonData.total).reduce((a, b) => a + b, 0)
+                setData({ contributions: weeks, totalContributions })
             } catch (err) {
                 setError(err instanceof Error ? err.message : "An error occurred")
             } finally {

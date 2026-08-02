@@ -2,14 +2,15 @@ import type { ComponentMeta } from '@/types'
 
 const meta: ComponentMeta = {
   slug: 'scroll-split-card',
-  name: 'Scroll Split Card (reference only)',
-  description: 'shadcn-distributed component — only the install command and a usage example were captured, not the actual source.',
+  name: 'Scroll Split Card',
+  description: 'Scroll-driven story card: colored panels rise over a background image to reveal title and description as you scroll.',
   category: 'Cards',
-  tags: ['reference', 'shadcn', 'scroll'],
+  tags: ['scroll', 'story', 'reveal', 'framer-motion'],
   family: 'misc',
-  deps: [],
-  runnable: false,
-  notes: 'Original source not saved — only `npx shadcn@latest add @componentry/scroll-split-card` and a usage snippet exist (see original v9.txt). Install via the shadcn CLI to get the real component.',
+  deps: ['framer-motion'],
+  runnable: true,
+  scrollable: true,
+  notes: 'Original shadcn-distributed source was never captured (see raw-misc/v9.txt) — this is a fresh implementation built from the captured usage example (containerRef, imageSrc, cards props).',
 }
 
 export default meta

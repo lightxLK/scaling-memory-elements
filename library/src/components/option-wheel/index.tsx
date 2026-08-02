@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect, type CSSProperties } from 'react';
+import { useRef, useState, useCallback, useEffect, useLayoutEffect, type CSSProperties } from 'react';
 
 type Side = 'left' | 'right';
 
@@ -171,7 +171,10 @@ const OptionWheel = ({
   const startLoop = useCallback(() => {
     if (rafRef.current != null) return;
     lastRef.current = performance.now();
-    rafRef.current = requestAnimationFrame(runFrame);
+    // Run the first frame synchronously (inside a layout effect on mount)
+    // rather than only via rAF, so items get their transform before the
+    // browser's first paint instead of flashing in stacked at rest.
+    runFrame(lastRef.current);
   }, [runFrame]);
 
   // Optional tick on selection change, throttled so fast scrolling can't spam
@@ -291,7 +294,7 @@ const OptionWheel = ({
     [applyTarget]
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     applyTarget(targetRef.current, false);
   }, [items, fontSize, spacing, curve, tilt, blur, fade, minOpacity, side, loop, smoothing, applyTarget]);
 
@@ -309,7 +312,7 @@ const OptionWheel = ({
       role="listbox"
       tabIndex={0}
       aria-label="Option wheel"
-      className={`relative h-full w-full select-none overflow-hidden outline-none [touch-action:none] ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}${className ? ` ${className}` : ''}`}
+      className={`relative h-full min-h-[24rem] w-full select-none overflow-hidden outline-none [touch-action:none] ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}${className ? ` ${className}` : ''}`}
       style={
         {
           '--ow-text-color': textColor,

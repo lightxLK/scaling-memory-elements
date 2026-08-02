@@ -9,6 +9,7 @@ const meta: ComponentMeta = {
   family: 'react-bits',
   deps: [],
   runnable: true,
+  background: 'dark',
 }
 
 export default meta

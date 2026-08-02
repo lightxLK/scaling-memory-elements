@@ -15,8 +15,8 @@ export function PreviewStage({ children, previewHeight = 650, background = 'ligh
       className={cn(
         'flex items-center justify-center p-10 rounded-lg',
         scrollable ? 'overflow-y-auto' : 'overflow-hidden',
-        background === 'dark' && 'bg-neutral-900 text-white',
-        background === 'light' && 'bg-neutral-50',
+        background === 'dark' && 'bg-muted text-foreground',
+        background === 'light' && 'bg-[#f2f0ea] text-[#14110b]',
         background === 'transparent' && 'bg-transparent'
       )}
     >

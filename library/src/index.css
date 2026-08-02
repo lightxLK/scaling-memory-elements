@@ -1,10 +1,48 @@
 @import "tailwindcss";
 @config "../tailwind.config.ts";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-foreground: oklch(0.145 0 0);
-  --color-muted-foreground: oklch(0.556 0 0);
-  --color-background: oklch(1 0 0);
-  --color-muted: oklch(0.97 0 0);
-  --color-border: oklch(0.922 0 0);
+  /* dark is the default palette — matches the app's default theme */
+  --color-foreground: #f2f0ea;
+  --color-muted-foreground: #948c7d;
+  --color-background: #0d0c0b;
+  --color-muted: #171512;
+  --color-border: #262320;
+  --color-accent: #ff6b4a;
+  --color-accent-foreground: #140f0b;
+
+  --font-sans: "Recursive", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Recursive", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+.light {
+  --color-foreground: #17140f;
+  --color-muted-foreground: #6b6255;
+  --color-background: #f7f5f0;
+  --color-muted: #ece8df;
+  --color-border: #ddd6c9;
+  --color-accent: #d94f2b;
+  --color-accent-foreground: #fdf6ef;
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-accent-foreground);
+}
+
+* {
+  border-color: var(--color-border);
 }
