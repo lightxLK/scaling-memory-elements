@@ -124,7 +124,7 @@ export function StickyScrollCards({
   return (
     <div
       ref={scrollRef}
-      className="relative w-full overflow-y-auto overflow-x-hidden rounded-md"
+      className="relative w-full overflow-y-auto overflow-x-hidden rounded-md [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
       style={{ height: STAGE_HEIGHT }}
     >
       <main

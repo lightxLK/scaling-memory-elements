@@ -97,7 +97,7 @@ export function CollectionSurfer({ items = ITEMS, variant = "magnetic" }: Collec
     return (
         <div
             ref={scrollRef}
-            className="relative bg-black text-white w-full overflow-y-auto overflow-x-hidden rounded-md"
+            className="relative bg-black text-white w-full overflow-y-auto overflow-x-hidden rounded-md [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
             style={{ height: `${STAGE_HEIGHT}px` }}
         >
             {/* 3. Infinite Spacer:

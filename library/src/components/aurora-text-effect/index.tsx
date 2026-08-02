@@ -186,6 +186,12 @@ export default function AuroraTextEffectDemo() {
   return (
     <AuroraTextEffect
       text="Aurora Effect"
+      // Force a solid black backdrop (matching the preview stage, which is
+      // pinned dark for this component) instead of the light/dark-toggled
+      // default — the glow layers need a dark backdrop to read correctly.
+      // Text color is forced to match, since the default is theme-toggled too.
+      className="bg-black"
+      textClassName="text-white"
       fontSize="clamp(3rem, 8vw, 7rem)"
       colors={{
         first: "bg-cyan-400",
