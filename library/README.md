@@ -30,3 +30,9 @@ If you are developing a production application, we recommend enabling type-aware
 ```
 
 See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+
+## Developer Tools
+
+- **`Alt+Shift+L+K`** (`⌥⇧LK` on macOS) — hidden shortcut that opens the author's site
+  (https://lightxlk.github.io/) in a new tab. Ignored while focus is inside an input, textarea,
+  or contenteditable element. See `src/components-lib/DeveloperEasterEgg.tsx`.

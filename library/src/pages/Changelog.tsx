@@ -32,7 +32,7 @@ function Section({ section }: { section: ChangelogSection }) {
 }
 
 export function Changelog() {
-  const { intro, releases } = parseChangelog(changelogRaw)
+  const { releases } = parseChangelog(changelogRaw)
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12 sm:px-10">
@@ -44,9 +44,9 @@ export function Changelog() {
       </Link>
 
       <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Changelog</h1>
-      {intro.length > 0 && (
-        <p className="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-muted-foreground">{intro.join(' ')}</p>
-      )}
+      <p className="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-muted-foreground">
+        Every notable change to this catalog, newest first.
+      </p>
 
       <div className="mt-10 flex flex-col gap-6">
         {releases.map((release) => (

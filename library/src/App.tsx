@@ -4,6 +4,7 @@ import { Home } from '@/pages/Home'
 import { ComponentDetail } from '@/pages/ComponentDetail'
 import { FullPageShowcase } from '@/pages/FullPageShowcase'
 import { Changelog } from '@/pages/Changelog'
+import { DeveloperEasterEgg } from '@/components-lib/DeveloperEasterEgg'
 import ThemeSwitch from '@/components/theme-switch'
 
 function DetailRoute({ entries }: { entries: CatalogEntry[] }) {
@@ -37,6 +38,7 @@ export default function App() {
 
   return (
     <HashRouter>
+      <DeveloperEasterEgg />
       <div className="min-h-screen bg-background text-foreground">
         <header className="sticky top-0 z-40 border-b border-border/80 bg-background/85 backdrop-blur">
           <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6 py-4 sm:px-10">
