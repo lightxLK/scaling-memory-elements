@@ -20,9 +20,9 @@ self-contained folder (`index.tsx` + `meta.ts`) discovered at build time via
 
 ## Build & Deployment Status
 
-Deployed via [`.github/workflows/deploy-pages.yml`](../.github/workflows/deploy-pages.yml):
+Deployed via [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml):
 lint → test → build → publish to GitHub Pages on every push to `master` that touches
-`library/**`.
+app source/config files.
 
 ## Code Style
 
@@ -32,26 +32,12 @@ lint → test → build → publish to GitHub Pages on every push to `master` th
 
 ## Tech Stack
 
-**Framework / rendering**
-![React](https://img.shields.io/badge/React-19-149ECA?style=flat&logo=react&logoColor=white)
-![React Router](https://img.shields.io/badge/React_Router-7-CA4245?style=flat&logo=reactrouter&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=flat&logo=vite&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat&logo=typescript&logoColor=white)
-
-**Styling / UI**
-![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
-![styled--components](https://img.shields.io/badge/styled--components-6-DB7093?style=flat&logo=styledcomponents&logoColor=white)
-
-**Animation / interaction**
-![Framer Motion](https://img.shields.io/badge/Framer_Motion-12-0055FF?style=flat)
-![Three.js](https://img.shields.io/badge/Three.js-0.185-000000?style=flat&logo=three.js&logoColor=white)
-![OGL](https://img.shields.io/badge/OGL-1-333333?style=flat)
-![Lenis](https://img.shields.io/badge/Lenis-1-orange?style=flat)
-
-**Tooling**
-![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?style=flat&logo=vitest&logoColor=white)
-![Testing Library](https://img.shields.io/badge/Testing_Library-16-E33332?style=flat&logo=testing-library&logoColor=white)
-![Oxlint](https://img.shields.io/badge/Oxlint-1-fdae2e?style=flat)
+| Category | Stack |
+|---|---|
+| Framework / rendering | ![React](https://img.shields.io/badge/React-19-149ECA?style=for-the-badge&logo=react&logoColor=white) ![React Router](https://img.shields.io/badge/React_Router-7-CA4245?style=for-the-badge&logo=reactrouter&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=for-the-badge&logo=vite&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white) |
+| Styling / UI | ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white) ![styled--components](https://img.shields.io/badge/styled--components-6-DB7093?style=for-the-badge&logo=styledcomponents&logoColor=white) |
+| Animation / interaction | ![Framer Motion](https://img.shields.io/badge/Framer_Motion-12-0055FF?style=for-the-badge&logo=framer&logoColor=white) ![Three.js](https://img.shields.io/badge/Three.js-0.185-000000?style=for-the-badge&logo=three.js&logoColor=white) ![OGL](https://img.shields.io/badge/OGL-1-333333?style=for-the-badge) ![Lenis](https://img.shields.io/badge/Lenis-1-orange?style=for-the-badge) |
+| Tooling | ![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?style=for-the-badge&logo=vitest&logoColor=white) ![Testing Library](https://img.shields.io/badge/Testing_Library-16-E33332?style=for-the-badge&logo=testing-library&logoColor=white) ![Oxlint](https://img.shields.io/badge/Oxlint-1-fdae2e?style=for-the-badge) |
 
 ## Features
 
@@ -71,18 +57,17 @@ lint → test → build → publish to GitHub Pages on every push to `master` th
 ## Project Structure
 
 ```
-library/
-├── public/                  Static assets (favicon, icon sprite, showcase HTML)
-├── src/
-│   ├── components/          One folder per specimen: index.tsx + meta.ts (+ optional assets)
-│   ├── components-lib/      Shared app chrome (ErrorBoundary, PreviewStage, easter egg)
-│   ├── lib/                 Small framework-agnostic utilities (theme, changelog parsing)
-│   ├── pages/                Home, ComponentDetail, Changelog, FullPageShowcase
-│   ├── catalog.ts           import.meta.glob-based component/meta/source discovery
-│   ├── types.ts             Shared ComponentMeta / Category types
-│   └── App.tsx              Router + top-level layout
-├── CHANGELOG.md
-└── vite.config.ts
+public/                  Static assets (favicon, icon sprite, showcase HTML)
+src/
+├── components/          One folder per specimen: index.tsx + meta.ts (+ optional assets)
+├── components-lib/      Shared app chrome (ErrorBoundary, PreviewStage, easter egg)
+├── lib/                 Small framework-agnostic utilities (theme, changelog parsing)
+├── pages/                Home, ComponentDetail, Changelog, FullPageShowcase
+├── catalog.ts           import.meta.glob-based component/meta/source discovery
+├── types.ts             Shared ComponentMeta / Category types
+└── App.tsx              Router + top-level layout
+CHANGELOG.md
+vite.config.ts
 ```
 
 ## Getting Started
@@ -91,7 +76,7 @@ Prerequisites: Node 22+, npm.
 
 ```bash
 git clone https://github.com/lightxLK/scaling-memory-elements.git
-cd scaling-memory-elements/library
+cd scaling-memory-elements
 npm install
 npm run dev
 ```
@@ -117,9 +102,9 @@ Vitest + React Testing Library + jsdom. Suites live alongside their source as
 
 ## Deployment
 
-[`.github/workflows/deploy-pages.yml`](../.github/workflows/deploy-pages.yml) builds and
-publishes on every push to `master` touching `library/**`: `npm install` → `npm run lint` →
-`npm test` → `npm run build` → upload `dist/` as a Pages artifact → deploy. `vite.config.ts`
+[`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) builds and
+publishes on every push to `master` touching app source/config files: `npm install` →
+`npm run lint` → `npm test` → `npm run build` → upload `dist/` as a Pages artifact → deploy. `vite.config.ts`
 sets `base: '/scaling-memory-elements/'` to match the Pages subpath; routing uses `HashRouter`
 since Pages serves no server-side rewrites.
 
